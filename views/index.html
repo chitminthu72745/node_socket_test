@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket Testing</title>
+</head>
+    <style>
+        .chatLogin{
+            margin: 20px auto;
+            width: 500px;
+        }
+        h3{
+            text-align: center;
+        }
+        input{
+            width: 98.5%;
+            padding: 5px 2px;
+            font-size: 14px;
+        }
+        button{
+            width: 100%;
+            float: right;
+            margin-top: 5px;
+            padding: 5px 15px;
+            background-color: purple;
+            color: white;
+            border-color: transparent;
+            cursor: pointer;
+            border-radius: 20px;
+        }
+        .chatLogin .chatHolder{
+            margin-top: 50px;
+            height: 50vh;
+            border: 1px solid #777;
+        }
+        .hide{
+            display: none;
+        }
+    </style>
+<body>
+    <div class="chatLogin loginHolder">
+        <h3>Login</h3>
+        <input type="text" placeholder="Username" class="input">
+        <button type="submit" class="login">Login</button>
+    </div>
+
+    <div class="chatLogin chatboxHolder hide">
+        <h3>Chat Box</h3>
+        <div class="chatHolder">
+            <p></p>
+        </div>
+        <br>
+        <input type="text" placeholder="Type" class="sendInput">
+        <button type="submit" class="sendInputbtn">Send</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io();
+
+        let loginHolder = document.querySelector('.loginHolder');
+        let chatboxHolder = document.querySelector('.chatboxHolder');
+        let chatHolder = document.querySelector('.chatHolder');
+        let loginInput = document.querySelector('.input');
+        let loginBtn = document.querySelector('.login');
+        let sendInput = document.querySelector('.sendInput');
+        let sendInputbtn = document.querySelector('.sendInputbtn');
+
+        loginBtn.addEventListener('click', login);
+        sendInputbtn.addEventListener('click', sending);
+        function login(){
+            socket.emit('login', loginInput.value);
+            loginInput.value = "";
+        }
+
+        function sending(){
+            socket.emit('msg', sendInput.value);
+            sendInput.value = "";
+        }
+
+        socket.on("login-success", data => {
+            if(data){
+                loginHolder.classList.add("hide");
+                chatboxHolder.classList.remove("hide");
+            }
+        });
+
+        socket.on("send-data", data => {
+            let msg = chatHolder.innerText;
+            chatHolder.innerText = msg + '\n' + data;
+        });
+    </script>
+</body>
+</html>
